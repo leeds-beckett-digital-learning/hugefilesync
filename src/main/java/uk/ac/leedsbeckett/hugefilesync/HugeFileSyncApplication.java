@@ -1,0 +1,780 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/Application.java to edit this template
+ */
+package uk.ac.leedsbeckett.hugefilesync;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.net.URISyntaxException;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
+/**
+ *
+ * @author jon
+ */
+public class HugeFileSyncApplication extends javax.swing.JFrame
+        implements SyncHugeFilesListener
+{
+  boolean running = false;
+  SyncHugeFiles processor = null;
+  
+  final JFileChooser fc = new JFileChooser();
+          
+  /**
+   * Creates new form HugeFileSyncApplication
+   */
+  public HugeFileSyncApplication() {
+    initComponents();
+    loadSettings();
+    lbasefield.getDocument().addDocumentListener( new DocumentListener()
+    {
+      @Override
+      public void insertUpdate(DocumentEvent de) {
+        batchfield.setText( "" );
+      }
+
+      @Override
+      public void removeUpdate(DocumentEvent de) {
+        batchfield.setText( "" );
+      }
+
+      @Override
+      public void changedUpdate(DocumentEvent de) {
+        batchfield.setText( "" );
+      }
+      
+    });
+  }
+
+  
+  public void enableAsAppropriate()
+  {
+    if ( running )
+    {
+      bbradiobutton.setEnabled( false );
+      lbasebutton.setEnabled( false );
+      lbasefield.setEnabled( false );
+      batchfield.setEnabled( false );
+      listingbutton.setEnabled( false );
+      listingfield.setEnabled( false );
+      localradiobutton.setEnabled( false );
+      runbutton.setEnabled( false );
+      sourcebutton.setEnabled( false );
+      sourcefield.setEnabled( false );
+      
+      urlfield.setEnabled( false );
+      usernamefield.setEnabled( false );
+      passwordfield.setEnabled( false );
+      
+      stopbutton.setEnabled( true );
+    }
+    else
+    {
+      bbradiobutton.setEnabled( true );
+      lbasebutton.setEnabled( true );
+      lbasefield.setEnabled( true );
+      batchfield.setEnabled( true );
+      listingbutton.setEnabled( true );
+      listingfield.setEnabled( true );
+      localradiobutton.setEnabled( true );
+      runbutton.setEnabled( true );
+      
+      boolean bb = bbradiobutton.isSelected();
+      sourcebutton.setEnabled( !bb );
+      sourcefield.setEnabled( !bb );
+      urlfield.setEnabled( bb );
+      usernamefield.setEnabled( bb );
+      passwordfield.setEnabled( bb );
+      
+      stopbutton.setEnabled( false );
+      
+    }
+  }
+
+  private void loadSettings()
+  {
+    File home = new File( System.getProperty("user.home") );
+    if ( !home.exists() ) return;
+    File settings = new File( home, ".hugefilesync.properties" );
+    Properties p = new Properties();
+    try ( Reader reader = new FileReader( settings ) )
+    {
+      p.load(reader);
+      lbasefield.setText( p.getProperty( "localbasedir" ) );
+      batchfield.setText( p.getProperty( "batchsubdir" ) );
+      listingfield.setText( p.getProperty( "listingfile" ) );
+      boolean bb = "bb".equals( p.getProperty( "from" ) );
+      bbradiobutton.setSelected( bb );
+      localradiobutton.setSelected( !bb );
+      urlfield.setText( p.getProperty( "remotebaseurl" ) );
+      usernamefield.setText( p.getProperty( "remoteusername" ) );
+      sourcefield.setText( p.getProperty( "sourcedir" ) );
+    }
+    catch (IOException ex)
+    {
+      
+    }
+    enableAsAppropriate();
+  }
+
+  private Properties saveSettings()
+  {
+    Properties p = new Properties();
+    File home = new File( System.getProperty("user.home") );
+    if ( !home.exists() ) return p;
+    
+    p.setProperty( "localbasedir", lbasefield.getText() );
+    p.setProperty( "batchsubdir", batchfield.getText() );
+    p.setProperty( "listingfile", listingfield.getText() );
+    p.setProperty( "from", bbradiobutton.isSelected()?"bb":"local" );
+    p.setProperty( "remotebaseurl", urlfield.getText() );
+    p.setProperty( "remoteusername", usernamefield.getText() );
+    p.setProperty( "sourcedir", sourcefield.getText() );
+    
+    
+    File settings = new File( home, ".hugefilesync.properties" );
+    try ( Writer writer = new FileWriter( settings ) )
+    {
+      p.store(writer, "Settings for hugefilesync application.");
+    }
+    catch (IOException ex)
+    {
+      
+    }
+    
+    // password isn't saved but it is needed...
+    p.setProperty( "remotepassword", passwordfield.getText() );
+    
+    return p;
+  }
+  
+  private Properties getValidSettings( Properties p )
+  {
+    
+    
+    return p;
+  }
+  
+  /**
+   * This method is called from within the constructor to initialize the form.
+   * WARNING: Do NOT modify this code. The content of this method is always
+   * regenerated by the Form Editor.
+   */
+  @SuppressWarnings("unchecked")
+  // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+  private void initComponents() {
+    java.awt.GridBagConstraints gridBagConstraints;
+
+    sourcebuttongroup = new javax.swing.ButtonGroup();
+    jTabbedPane1 = new javax.swing.JTabbedPane();
+    jPanel4 = new javax.swing.JPanel();
+    jScrollPane4 = new javax.swing.JScrollPane();
+    jPanel5 = new javax.swing.JPanel();
+    jLabel2 = new javax.swing.JLabel();
+    jLabel11 = new javax.swing.JLabel();
+    jLabel3 = new javax.swing.JLabel();
+    jLabel9 = new javax.swing.JLabel();
+    jLabel1 = new javax.swing.JLabel();
+    jLabel5 = new javax.swing.JLabel();
+    jLabel6 = new javax.swing.JLabel();
+    jLabel4 = new javax.swing.JLabel();
+    jLabel10 = new javax.swing.JLabel();
+    jLabel7 = new javax.swing.JLabel();
+    jLabel8 = new javax.swing.JLabel();
+    jPanel6 = new javax.swing.JPanel();
+    lbasefield = new javax.swing.JTextField();
+    lbasebutton = new javax.swing.JButton();
+    jPanel16 = new javax.swing.JPanel();
+    batchfield = new javax.swing.JTextField();
+    batchbutton = new javax.swing.JButton();
+    jPanel7 = new javax.swing.JPanel();
+    listingfield = new javax.swing.JTextField();
+    listingbutton = new javax.swing.JButton();
+    jPanel8 = new javax.swing.JPanel();
+    bbradiobutton = new javax.swing.JRadioButton();
+    localradiobutton = new javax.swing.JRadioButton();
+    jPanel9 = new javax.swing.JPanel();
+    urlfield = new javax.swing.JTextField();
+    jPanel15 = new javax.swing.JPanel();
+    usernamefield = new javax.swing.JTextField();
+    jPanel14 = new javax.swing.JPanel();
+    passwordfield = new javax.swing.JPasswordField();
+    jPanel10 = new javax.swing.JPanel();
+    sourcefield = new javax.swing.JTextField();
+    sourcebutton = new javax.swing.JButton();
+    jPanel11 = new javax.swing.JPanel();
+    runbutton = new javax.swing.JButton();
+    stopbutton = new javax.swing.JButton();
+    jPanel13 = new javax.swing.JPanel();
+    fileprogress = new javax.swing.JProgressBar();
+    jPanel12 = new javax.swing.JPanel();
+    totalprogress = new javax.swing.JProgressBar();
+    jPanel1 = new javax.swing.JPanel();
+    jPanel2 = new javax.swing.JPanel();
+    clearlogbutton = new javax.swing.JButton();
+    jScrollPane1 = new javax.swing.JScrollPane();
+    logtextarea = new javax.swing.JTextArea();
+    menuBar = new javax.swing.JMenuBar();
+    fileMenu = new javax.swing.JMenu();
+    exitMenuItem = new javax.swing.JMenuItem();
+
+    setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+    jPanel4.setLayout(new java.awt.BorderLayout());
+
+    jPanel5.setLayout(new java.awt.GridBagLayout());
+
+    jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    jLabel2.setText("Local Base Dir:");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+    jPanel5.add(jLabel2, gridBagConstraints);
+
+    jLabel11.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    jLabel11.setText("Batch sub-folder:");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+    jPanel5.add(jLabel11, gridBagConstraints);
+
+    jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    jLabel3.setText("Listing File:");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+    jPanel5.add(jLabel3, gridBagConstraints);
+
+    jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    jLabel9.setText("Copy From:");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+    jPanel5.add(jLabel9, gridBagConstraints);
+
+    jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    jLabel1.setText("Remote Base URL:");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+    jPanel5.add(jLabel1, gridBagConstraints);
+
+    jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    jLabel5.setText("Remote User Name:");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+    jPanel5.add(jLabel5, gridBagConstraints);
+
+    jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    jLabel6.setText("Remote Password:");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+    jPanel5.add(jLabel6, gridBagConstraints);
+
+    jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    jLabel4.setText("Source Dir:");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+    jPanel5.add(jLabel4, gridBagConstraints);
+
+    jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    jLabel10.setText(" ");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+    jPanel5.add(jLabel10, gridBagConstraints);
+
+    jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    jLabel7.setText("Progress:");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+    jPanel5.add(jLabel7, gridBagConstraints);
+
+    jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+    jLabel8.setText("File Progress:");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+    jPanel5.add(jLabel8, gridBagConstraints);
+
+    lbasefield.setMinimumSize(new java.awt.Dimension(200, 25));
+    lbasefield.setPreferredSize(new java.awt.Dimension(400, 25));
+    jPanel6.add(lbasefield);
+
+    lbasebutton.setText("Browse");
+    lbasebutton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        lbasebuttonActionPerformed(evt);
+      }
+    });
+    jPanel6.add(lbasebutton);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+    jPanel5.add(jPanel6, gridBagConstraints);
+
+    batchfield.setMinimumSize(new java.awt.Dimension(200, 25));
+    batchfield.setPreferredSize(new java.awt.Dimension(400, 25));
+    jPanel16.add(batchfield);
+
+    batchbutton.setText("Browse");
+    batchbutton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        batchbuttonActionPerformed(evt);
+      }
+    });
+    jPanel16.add(batchbutton);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+    jPanel5.add(jPanel16, gridBagConstraints);
+
+    listingfield.setPreferredSize(new java.awt.Dimension(400, 25));
+    jPanel7.add(listingfield);
+
+    listingbutton.setText("Browse");
+    listingbutton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        listingbuttonActionPerformed(evt);
+      }
+    });
+    jPanel7.add(listingbutton);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+    jPanel5.add(jPanel7, gridBagConstraints);
+
+    sourcebuttongroup.add(bbradiobutton);
+    bbradiobutton.setSelected(true);
+    bbradiobutton.setText("BB Learn");
+    bbradiobutton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        bbradiobuttonActionPerformed(evt);
+      }
+    });
+    jPanel8.add(bbradiobutton);
+
+    sourcebuttongroup.add(localradiobutton);
+    localradiobutton.setText("Other File Store");
+    localradiobutton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        localradiobuttonActionPerformed(evt);
+      }
+    });
+    jPanel8.add(localradiobutton);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+    jPanel5.add(jPanel8, gridBagConstraints);
+
+    urlfield.setPreferredSize(new java.awt.Dimension(400, 25));
+    jPanel9.add(urlfield);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+    jPanel5.add(jPanel9, gridBagConstraints);
+
+    jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+    usernamefield.setPreferredSize(new java.awt.Dimension(200, 25));
+    jPanel15.add(usernamefield);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+    jPanel5.add(jPanel15, gridBagConstraints);
+
+    jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+    passwordfield.setPreferredSize(new java.awt.Dimension(200, 25));
+    jPanel14.add(passwordfield);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+    jPanel5.add(jPanel14, gridBagConstraints);
+
+    sourcefield.setEnabled(false);
+    sourcefield.setPreferredSize(new java.awt.Dimension(400, 25));
+    jPanel10.add(sourcefield);
+
+    sourcebutton.setText("Browse");
+    sourcebutton.setEnabled(false);
+    sourcebutton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        sourcebuttonActionPerformed(evt);
+      }
+    });
+    jPanel10.add(sourcebutton);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+    jPanel5.add(jPanel10, gridBagConstraints);
+
+    runbutton.setText("Run");
+    runbutton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        runbuttonActionPerformed(evt);
+      }
+    });
+    jPanel11.add(runbutton);
+
+    stopbutton.setText("Stop");
+    stopbutton.setEnabled(false);
+    stopbutton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        stopbuttonActionPerformed(evt);
+      }
+    });
+    jPanel11.add(stopbutton);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+    jPanel5.add(jPanel11, gridBagConstraints);
+
+    fileprogress.setPreferredSize(new java.awt.Dimension(400, 20));
+    fileprogress.setStringPainted(true);
+    jPanel13.add(fileprogress);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+    jPanel5.add(jPanel13, gridBagConstraints);
+
+    totalprogress.setPreferredSize(new java.awt.Dimension(400, 20));
+    totalprogress.setStringPainted(true);
+    jPanel12.add(totalprogress);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+    jPanel5.add(jPanel12, gridBagConstraints);
+
+    jScrollPane4.setViewportView(jPanel5);
+
+    jPanel4.add(jScrollPane4, java.awt.BorderLayout.CENTER);
+
+    jTabbedPane1.addTab("Copy Huge Files", jPanel4);
+
+    jPanel1.setLayout(new java.awt.BorderLayout());
+
+    clearlogbutton.setText("Clear Log");
+    clearlogbutton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        clearlogbuttonActionPerformed(evt);
+      }
+    });
+    jPanel2.add(clearlogbutton);
+
+    jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
+
+    logtextarea.setEditable(false);
+    logtextarea.setColumns(20);
+    logtextarea.setRows(5);
+    jScrollPane1.setViewportView(logtextarea);
+
+    jPanel1.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+
+    jTabbedPane1.addTab("Log", jPanel1);
+
+    getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
+
+    fileMenu.setMnemonic('f');
+    fileMenu.setText("File");
+
+    exitMenuItem.setMnemonic('x');
+    exitMenuItem.setText("Exit");
+    exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        exitMenuItemActionPerformed(evt);
+      }
+    });
+    fileMenu.add(exitMenuItem);
+
+    menuBar.add(fileMenu);
+
+    setJMenuBar(menuBar);
+
+    pack();
+  }// </editor-fold>//GEN-END:initComponents
+
+  private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMenuItemActionPerformed
+    saveSettings();
+    System.exit(0);
+  }//GEN-LAST:event_exitMenuItemActionPerformed
+
+  private void lbasebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lbasebuttonActionPerformed
+    
+    fc.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
+    fc.setAcceptAllFileFilterUsed( true );
+    int v = fc.showOpenDialog( this );
+    
+    if (v == JFileChooser.APPROVE_OPTION)
+    {
+      File file = fc.getSelectedFile();
+      lbasefield.setText( file.getPath() );
+    }
+  }//GEN-LAST:event_lbasebuttonActionPerformed
+
+  private void listingbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listingbuttonActionPerformed
+    
+    fc.setFileSelectionMode( JFileChooser.FILES_ONLY );
+    fc.setAcceptAllFileFilterUsed( true );
+    int v = fc.showOpenDialog( this );
+    
+    if (v == JFileChooser.APPROVE_OPTION)
+    {
+      File file = fc.getSelectedFile();
+      listingfield.setText( file.getPath() );
+    }
+  }//GEN-LAST:event_listingbuttonActionPerformed
+
+  private void sourcebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sourcebuttonActionPerformed
+    
+    fc.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
+    fc.setAcceptAllFileFilterUsed( true );
+    int v = fc.showOpenDialog( this );
+    
+    if (v == JFileChooser.APPROVE_OPTION)
+    {
+      File file = fc.getSelectedFile();
+      sourcefield.setText( file.getPath() );
+    }
+
+  }//GEN-LAST:event_sourcebuttonActionPerformed
+
+  private void bbradiobuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bbradiobuttonActionPerformed
+    enableAsAppropriate();
+  }//GEN-LAST:event_bbradiobuttonActionPerformed
+
+  private void localradiobuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_localradiobuttonActionPerformed
+    enableAsAppropriate();
+  }//GEN-LAST:event_localradiobuttonActionPerformed
+
+  private void runbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runbuttonActionPerformed
+    
+    
+    Properties p = getValidSettings( saveSettings() );
+    if ( p==null )
+      return;
+    
+    try
+    {
+      processor = new SyncHugeFiles( p, this );
+      processor.start();
+    }
+    catch (URISyntaxException ex)
+    {
+    }
+            
+  }//GEN-LAST:event_runbuttonActionPerformed
+
+  private void stopbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopbuttonActionPerformed
+    if ( processor != null )
+      processor.cancel();
+  }//GEN-LAST:event_stopbuttonActionPerformed
+
+  private void clearlogbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearlogbuttonActionPerformed
+    logtextarea.setText( "" );
+  }//GEN-LAST:event_clearlogbuttonActionPerformed
+
+  private void batchbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_batchbuttonActionPerformed
+
+    String basename = lbasefield.getText();
+    if ( basename == null ) basename = "";
+    basename = basename.trim();
+    if ( basename.length() == 0 )
+    {
+      JOptionPane.showMessageDialog( this, "You need to select a local base directory before selecting a batch subdirectory." );
+      return;
+    }
+    
+    File basedir = new File( basename );
+    if ( !basedir.exists() )
+    {
+      JOptionPane.showMessageDialog( this, "The selected local base directory doesn't exist. You need to select a local base directory before selecting a batch subdirectory." );
+      return;
+    }
+    
+    if ( !basedir.isDirectory() )
+    {
+      JOptionPane.showMessageDialog( this, "The selected local base directory must actually refer to a directory. You need to select a local base directory before selecting a batch subdirectory." );
+      return;
+    }
+    
+    fc.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
+    fc.setAcceptAllFileFilterUsed( true );
+    fc.setCurrentDirectory( basedir );
+    int v = fc.showOpenDialog( this );
+    
+    if (v == JFileChooser.APPROVE_OPTION)
+    {
+      File file = fc.getSelectedFile();
+      batchfield.setText( file.getPath() );
+      if ( !file.getParentFile().equals( basedir ) )
+      {
+        JOptionPane.showMessageDialog( this, "The selected batch directory is not a direct sub-directory of the base directory. You need to select a local base directory before (creating and) selecting a batch subdirectory." );        
+      }
+    }
+    
+    
+  }//GEN-LAST:event_batchbuttonActionPerformed
+
+  /**
+   * @param args the command line arguments
+   */
+  public static void main(String args[]) {
+    /* Set the Nimbus look and feel */
+    //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+    /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+     */
+    try {
+      for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+        if ("Nimbus".equals(info.getName())) {
+          javax.swing.UIManager.setLookAndFeel(info.getClassName());
+          break;
+        }
+      }
+    } catch (ClassNotFoundException ex) {
+      java.util.logging.Logger.getLogger(HugeFileSyncApplication.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    } catch (InstantiationException ex) {
+      java.util.logging.Logger.getLogger(HugeFileSyncApplication.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    } catch (IllegalAccessException ex) {
+      java.util.logging.Logger.getLogger(HugeFileSyncApplication.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+      java.util.logging.Logger.getLogger(HugeFileSyncApplication.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    }
+    //</editor-fold>
+
+    /* Create and display the form */
+    java.awt.EventQueue.invokeLater(new Runnable() {
+      public void run() {
+        new HugeFileSyncApplication().setVisible(true);
+      }
+    });
+  }
+
+  // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JButton batchbutton;
+  private javax.swing.JTextField batchfield;
+  private javax.swing.JRadioButton bbradiobutton;
+  private javax.swing.JButton clearlogbutton;
+  private javax.swing.JMenuItem exitMenuItem;
+  private javax.swing.JMenu fileMenu;
+  private javax.swing.JProgressBar fileprogress;
+  private javax.swing.JLabel jLabel1;
+  private javax.swing.JLabel jLabel10;
+  private javax.swing.JLabel jLabel11;
+  private javax.swing.JLabel jLabel2;
+  private javax.swing.JLabel jLabel3;
+  private javax.swing.JLabel jLabel4;
+  private javax.swing.JLabel jLabel5;
+  private javax.swing.JLabel jLabel6;
+  private javax.swing.JLabel jLabel7;
+  private javax.swing.JLabel jLabel8;
+  private javax.swing.JLabel jLabel9;
+  private javax.swing.JPanel jPanel1;
+  private javax.swing.JPanel jPanel10;
+  private javax.swing.JPanel jPanel11;
+  private javax.swing.JPanel jPanel12;
+  private javax.swing.JPanel jPanel13;
+  private javax.swing.JPanel jPanel14;
+  private javax.swing.JPanel jPanel15;
+  private javax.swing.JPanel jPanel16;
+  private javax.swing.JPanel jPanel2;
+  private javax.swing.JPanel jPanel4;
+  private javax.swing.JPanel jPanel5;
+  private javax.swing.JPanel jPanel6;
+  private javax.swing.JPanel jPanel7;
+  private javax.swing.JPanel jPanel8;
+  private javax.swing.JPanel jPanel9;
+  private javax.swing.JScrollPane jScrollPane1;
+  private javax.swing.JScrollPane jScrollPane4;
+  private javax.swing.JTabbedPane jTabbedPane1;
+  private javax.swing.JButton lbasebutton;
+  private javax.swing.JTextField lbasefield;
+  private javax.swing.JButton listingbutton;
+  private javax.swing.JTextField listingfield;
+  private javax.swing.JRadioButton localradiobutton;
+  private javax.swing.JTextArea logtextarea;
+  private javax.swing.JMenuBar menuBar;
+  private javax.swing.JPasswordField passwordfield;
+  private javax.swing.JButton runbutton;
+  private javax.swing.JButton sourcebutton;
+  private javax.swing.ButtonGroup sourcebuttongroup;
+  private javax.swing.JTextField sourcefield;
+  private javax.swing.JButton stopbutton;
+  private javax.swing.JProgressBar totalprogress;
+  private javax.swing.JTextField urlfield;
+  private javax.swing.JTextField usernamefield;
+  // End of variables declaration//GEN-END:variables
+
+  @Override
+  public void syncHugeFilesStarted()
+  {
+    running = true;
+    enableAsAppropriate();
+    fileprogress.setString( "starting..." );
+    fileprogress.setValue( 0 );
+    totalprogress.setString( "Starting..." );
+    totalprogress.setValue( 0 );
+  }
+
+  @Override
+  public void syncHugeFilesStopped(boolean success)
+  {
+    running = false;
+    processor = null;
+    enableAsAppropriate();
+  }
+
+  @Override
+  public void syncHugeFilesTotalProgress( int n, int of, String message )
+  {
+    if ( message != null )
+      fileprogress.setString( message );
+    fileprogress.setValue( n );    
+    fileprogress.setMaximum( of );    
+  }
+  
+  @Override
+  public void syncHugeFilesPartProgress( int n, int of, String message )
+  {
+    if ( message != null )
+      totalprogress.setString( message );
+    totalprogress.setValue( n );    
+    totalprogress.setMaximum( of );        
+  }
+
+  @Override
+  public void syncHugeFilesLog( String message )
+  {
+    logtextarea.append( message );
+    logtextarea.append( "\n" );
+  }
+
+}
