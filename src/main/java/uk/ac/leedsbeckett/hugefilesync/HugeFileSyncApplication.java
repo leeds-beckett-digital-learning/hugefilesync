@@ -174,7 +174,8 @@ public class HugeFileSyncApplication extends javax.swing.JFrame
    */
   @SuppressWarnings("unchecked")
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-  private void initComponents() {
+  private void initComponents()
+  {
     java.awt.GridBagConstraints gridBagConstraints;
 
     sourcebuttongroup = new javax.swing.ButtonGroup();
@@ -318,8 +319,10 @@ public class HugeFileSyncApplication extends javax.swing.JFrame
     jPanel6.add(lbasefield);
 
     lbasebutton.setText("Browse");
-    lbasebutton.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
+    lbasebutton.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
         lbasebuttonActionPerformed(evt);
       }
     });
@@ -335,8 +338,10 @@ public class HugeFileSyncApplication extends javax.swing.JFrame
     jPanel16.add(batchfield);
 
     batchbutton.setText("Browse");
-    batchbutton.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
+    batchbutton.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
         batchbuttonActionPerformed(evt);
       }
     });
@@ -351,8 +356,10 @@ public class HugeFileSyncApplication extends javax.swing.JFrame
     jPanel7.add(listingfield);
 
     listingbutton.setText("Browse");
-    listingbutton.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
+    listingbutton.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
         listingbuttonActionPerformed(evt);
       }
     });
@@ -366,8 +373,10 @@ public class HugeFileSyncApplication extends javax.swing.JFrame
     sourcebuttongroup.add(bbradiobutton);
     bbradiobutton.setSelected(true);
     bbradiobutton.setText("BB Learn");
-    bbradiobutton.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
+    bbradiobutton.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
         bbradiobuttonActionPerformed(evt);
       }
     });
@@ -375,8 +384,10 @@ public class HugeFileSyncApplication extends javax.swing.JFrame
 
     sourcebuttongroup.add(localradiobutton);
     localradiobutton.setText("Other File Store");
-    localradiobutton.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
+    localradiobutton.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
         localradiobuttonActionPerformed(evt);
       }
     });
@@ -421,8 +432,10 @@ public class HugeFileSyncApplication extends javax.swing.JFrame
 
     sourcebutton.setText("Browse");
     sourcebutton.setEnabled(false);
-    sourcebutton.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
+    sourcebutton.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
         sourcebuttonActionPerformed(evt);
       }
     });
@@ -434,8 +447,12 @@ public class HugeFileSyncApplication extends javax.swing.JFrame
     jPanel5.add(jPanel10, gridBagConstraints);
 
     runbutton.setText("Run");
-    runbutton.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
+    runbutton.setMinimumSize(new java.awt.Dimension(100, 23));
+    runbutton.setPreferredSize(new java.awt.Dimension(100, 23));
+    runbutton.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
         runbuttonActionPerformed(evt);
       }
     });
@@ -443,8 +460,12 @@ public class HugeFileSyncApplication extends javax.swing.JFrame
 
     stopbutton.setText("Stop");
     stopbutton.setEnabled(false);
-    stopbutton.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
+    stopbutton.setMinimumSize(new java.awt.Dimension(100, 23));
+    stopbutton.setPreferredSize(new java.awt.Dimension(100, 23));
+    stopbutton.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
         stopbuttonActionPerformed(evt);
       }
     });
@@ -482,8 +503,10 @@ public class HugeFileSyncApplication extends javax.swing.JFrame
     jPanel1.setLayout(new java.awt.BorderLayout());
 
     clearlogbutton.setText("Clear Log");
-    clearlogbutton.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
+    clearlogbutton.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
         clearlogbuttonActionPerformed(evt);
       }
     });
@@ -507,8 +530,10 @@ public class HugeFileSyncApplication extends javax.swing.JFrame
 
     exitMenuItem.setMnemonic('x');
     exitMenuItem.setText("Exit");
-    exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
+    exitMenuItem.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
         exitMenuItemActionPerformed(evt);
       }
     });
@@ -773,6 +798,7 @@ public class HugeFileSyncApplication extends javax.swing.JFrame
   @Override
   public void syncHugeFilesLog( String message )
   {
+    System.out.println( message );
     logtextarea.append( message );
     logtextarea.append( "\n" );
   }

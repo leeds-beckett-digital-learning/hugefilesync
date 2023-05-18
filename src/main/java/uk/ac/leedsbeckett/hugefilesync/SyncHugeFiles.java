@@ -3,20 +3,17 @@
  */
 package uk.ac.leedsbeckett.hugefilesync;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -24,13 +21,16 @@ import java.util.logging.Logger;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.http.Header;
+import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.routing.HttpRoutePlanner;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 
 public class SyncHugeFiles implements Runnable
 {
@@ -43,6 +43,8 @@ public class SyncHugeFiles implements Runnable
   final Path localbase;
   final Path localbatchbase;
   final HashMap<String,Blob> blobmap = new HashMap<>();
+  final ArrayList<Blob> blobs = new ArrayList<>();
+  
   final URI remotebase;
   final Path sourcedir; // if not bb source
   
@@ -51,8 +53,6 @@ public class SyncHugeFiles implements Runnable
   
   int blobcount = 0;
   int filecount = 0;
-  int steps = 0;
-  int currentstep=1;
   
   SyncHugeFilesListener listener = null;
   Thread thread;
@@ -158,7 +158,7 @@ public class SyncHugeFiles implements Runnable
     log( "Starting" );
     loadListing();
     log( "Loaded listing file." );
-    if ( listener != null ) listener.syncHugeFilesTotalProgress( currentstep++, steps, "Prepping" );
+    if ( listener != null ) listener.syncHugeFilesTotalProgress( 0, blobcount, "Prepping" );
     
     if ( frombb )
       credsProvider.setCredentials(
@@ -168,7 +168,14 @@ public class SyncHugeFiles implements Runnable
     try
     {
       if ( frombb )
-        httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
+      {
+        HttpHost proxyhost = new HttpHost( "160.9.43.250", 3128 );
+        HttpRoutePlanner routePlanner = new DefaultProxyRoutePlanner( proxyhost );
+        httpclient = HttpClients.custom()
+                .setRoutePlanner(routePlanner)
+                .setDefaultCredentialsProvider(credsProvider)
+                .build();
+      }
       syncBlobs();              
     }
     finally
@@ -180,8 +187,8 @@ public class SyncHugeFiles implements Runnable
 
     if ( listener != null )
     {
-      listener.syncHugeFilesTotalProgress( steps, steps, "Complete" );
-      listener.syncHugeFilesPartProgress( steps, steps, "Complete" );
+      listener.syncHugeFilesTotalProgress( blobcount, blobcount, "Complete" );
+      listener.syncHugeFilesPartProgress( 100, 100, "Complete" );
     }
     
     System.out.println( "Done" );  
@@ -202,23 +209,30 @@ public class SyncHugeFiles implements Runnable
         {
           blob = new Blob( localbase, remotebase, sourcedir, blobdigest );
           blobmap.put( blobdigest, blob );
+          blobs.add( blob );
           blobcount++;
         }
         blob.addFileEntry( new FileEntry( source, path ) );
         filecount++;
       }
     }
-    steps = filecount + blobcount + 1;
   }
 
   void syncBlobs() throws NoSuchAlgorithmException, IOException, URISyntaxException, InterruptedException
   {
     int n = blobmap.size();
     int i=1;
-    for ( Blob blob : blobmap.values() )
+    for ( Blob blob : blobs )
     {
-      log( "Processing blob " + (i++) + " of " + n );
+      log( "-----------------------------------------------------------------" );
+      log( "Processing blob " + (i++) + " of " + n + " blob digest " + blob.blobdigest );
+      if ( listener != null )
+      {
+        listener.syncHugeFilesTotalProgress( i, n, "Processing blob " + blob.blobdigest );
+        listener.syncHugeFilesPartProgress( 0, 100, "Checking blob" );
+      }
       syncBlob( blob );    
+      listener.syncHugeFilesTotalProgress( i, n, "" );
       if ( thread.isInterrupted() )
         throw new InterruptedException( "User interrupted process." );
     }
@@ -227,16 +241,15 @@ public class SyncHugeFiles implements Runnable
   void syncBlob( Blob blob ) throws NoSuchAlgorithmException, IOException, URISyntaxException, InterruptedException
   {
     // download the blob if we don't already have it
-    if ( listener != null ) listener.syncHugeFilesTotalProgress( currentstep++, steps, "Downloading blob " + blob.blobdigest );
     downloadBlob( blob );
     
     // link files to the blob
     for ( FileEntry file : blob.getFileEntries() )
     {
+      log( "Processing file " + file.path );
       String path = file.path;
       if ( path.startsWith( "/" ) )
         path = path.substring( 1 );
-      if ( listener != null ) listener.syncHugeFilesTotalProgress( currentstep++, steps, "Downloading " + path );
       Path linkpath = localbatchbase.resolve( path );
       //Path rellink = linkpath.getParent().relativize( blob.localpath );
       if ( !Files.exists( blob.localpath ) )
@@ -260,6 +273,7 @@ public class SyncHugeFiles implements Runnable
   {    
     if ( Files.exists( blob.localpath ) )
     {
+      log( "Local copy of Blob present already. Checking if it is complete..." );
       String md5 = computeMD5( blob.localpath );
       if ( md5.equals( blob.blobdigest ) )
       {
@@ -277,6 +291,9 @@ public class SyncHugeFiles implements Runnable
     if ( !Files.exists( parent ) )
       Files.createDirectories( parent );
     
+    if ( listener != null )
+      listener.syncHugeFilesPartProgress( 0, 100, "Fetching blob" );
+    
     if ( frombb )
       downloadBlob( blob.uri, blob.localpath );
     else
@@ -288,7 +305,7 @@ public class SyncHugeFiles implements Runnable
     Files.copy(source, destination );
   }
   
-  void downloadBlob( URI source, Path destination ) throws IOException, InterruptedException
+ void downloadBlob( URI source, Path destination ) throws IOException, InterruptedException
   {
     final HttpGet httpget = new HttpGet( source );
 
@@ -304,7 +321,7 @@ public class SyncHugeFiles implements Runnable
       Header cl = response.getFirstHeader( "Content-Length" );
       if ( cl != null )
       {
-        log( "header {" + cl.getValue() + "}" );
+        log( "Content-Length header {" + cl.getValue() + "}" );
         length = Long.parseLong( cl.getValue() );
       }
       
